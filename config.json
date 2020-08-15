@@ -1,4 +1,11 @@
 {
     "bot_token": "",
-    "bot_channel": "dev-updates"
+    "bot_update_header": "ZIGGY DEVELOPMENT UPDATE",
+    "bot_channel": "dev-updates",
+    "bot_status_emoji": {
+        "pass": "<:status_pass:744277581485834392>",
+        "success": "<:status_success:744277582303985784>",
+        "success_warning": "<:status_success_warning:744277582484078592>",
+        "failure": "<:status_failure:744277581490159686>"
+    }
 }

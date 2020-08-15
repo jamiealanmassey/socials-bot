@@ -1,5 +1,5 @@
 {
-    "name": "Stardust Social Bot",
+    "name": "social-bot",
     "version": "0.1",
     "description": "A bot to push updates to defined social channels",
     "main": "bot.js",
