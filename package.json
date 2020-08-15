@@ -5,6 +5,7 @@
     "main": "bot.js",
     "author": "Stardust Collective",
     "dependencies": {
-        "winston": "^3.3.3"
+        "date-and-time": "^0.14.0",
+        "discord.js": "^12.3.0"
     }
 }
