@@ -1,0 +1,10 @@
+{
+    "name": "Stardust Social Bot",
+    "version": "0.1",
+    "description": "A bot to push updates to defined social channels",
+    "main": "bot.js",
+    "author": "Stardust Collective",
+    "dependencies": {
+        "winston": "^3.3.3"
+    }
+}
