@@ -5,10 +5,10 @@ const socials = require('./socials.json')
 const Twit = require('twit')
 
 var clientTwitter = new Twit({
-    consumer_key: socials.twitter.consumer_key,
-    consumer_secret: socials.twitter.consumer_secret,
-    access_token: socials.twitter.access_token_key,
-    access_token_secret: socials.twitter.access_token_secret,
+    consumer_key: process.env.twitter_consumer_key,
+    consumer_secret: process.env.twitter_consumer_secret, 
+    access_token: process.env.twitter_access_token_key,
+    access_token_secret: process.env.twitter_access_token_secret,
     timeout_ms: 30*1000,
     strictSSL: true
 })

@@ -11,10 +11,10 @@ const config = require('./config.json')
 
 const client = new Discord.Client();
 const hearts = [
-    config.bot_status_emoji.pass,
-    config.bot_status_emoji.success,
-    config.bot_status_emoji.success_warning,
-    config.bot_status_emoji.failure
+    process.env.bot_status_emoji_pass,
+    process.env.bot_status_emoji_success,
+    process.env.bot_status_emoji_success_warning,
+    process.env.bot_status_emoji_failure,
 ]
 
 client.on('ready', () => {
@@ -69,7 +69,7 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-    if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR) && message.channel.name === config.bot_channel) {
+    if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR) && message.channel.name === process.env.bot_channel) {
         var messageTrimmed = message.content.trim()
         var messageSplit = messageTrimmed.split('\n')
         var commands = new Map()
@@ -244,4 +244,4 @@ client.on('message', message => {
     }
 })
 
-client.login(config.bot_token)
+client.login(process.env.bot_token)
