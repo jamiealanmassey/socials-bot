@@ -107,7 +107,7 @@ client.on('message', message => {
         }
 
         var mediaValdiator = (urls) => {
-            const imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp|mp4)+/gi
+            const imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp)+/gi
             return urls.filter((value, index, array) => {
                 return value.match(imageExpr)
             })
@@ -209,27 +209,31 @@ client.on('message', message => {
 
         var messageExecute = (async () => {
             if (commands.get('!content') && commands.get('!title')) {
-                message.channel.send(resultData.compiled())
-                    .then(message => {
-                        resultData.message = message
-                        if (commands.get('!media') && commands.get('!media').length > 0) {
-                            var urls = mediaValdiator(commands.get('!media'))
-                            if (urls.length > 0) {
-                                botMedia.downloadBatch(urls)
-                                    .then(() => {
-                                        executeSocials()
-                                    })
-                                    .catch((_) => {
-                                        resultData.mediaState['twitter'] = 3
-                                        resultData.mediaState['devlog'] = 3
-                                        resultData.message.edit(resultData.compiled())
-                                    })
+                botMedia.flushAll('./media/')
+                    .then(() => {
+                        message.channel.send(resultData.compiled())
+                        .then(message => {
+                            resultData.message = message
+                            if (commands.get('!media') && commands.get('!media').length > 0) {
+                                var urls = mediaValdiator(commands.get('!media'))
+                                if (urls.length > 0) {
+                                    botMedia.downloadBatch(urls)
+                                        .then(() => {
+                                            executeSocials()
+                                        })
+                                        .catch((_) => {
+                                            resultData.mediaState['twitter'] = 3
+                                            resultData.mediaState['devlog'] = 3
+                                            resultData.message.edit(resultData.compiled())
+                                        })
+                                }
                             } else {
                                 executeSocials()
                             }
-                        }
+                        })
+                        .catch(error => { botUtils.logify(error) })
                     })
-                    .catch(error => { botUtils.logify(error) })
+                    .catch(error => { botUtils.logify(`Failed to flush images ${error}`) })
             }
         })
 
