@@ -1,2 +1,1 @@
-web: echo "Block web service"
-service: npm start
+worker: npm start
