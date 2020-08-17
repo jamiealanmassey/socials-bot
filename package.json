@@ -1,6 +1,6 @@
 {
     "name": "social-bot",
-    "version": "0.1",
+    "version": "1.0.0",
     "description": "A bot to push updates to defined social channels",
     "main": "bot.js",
     "author": "Stardust Collective",
