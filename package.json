@@ -6,6 +6,10 @@
     "author": "Stardust Collective",
     "dependencies": {
         "date-and-time": "^0.14.0",
-        "discord.js": "^12.3.0"
+        "discord.js": "^12.3.0",
+        "file-type": "^14.7.1",
+        "node-fetch": "^2.6.0",
+        "object-sizeof": "^1.6.1",
+        "twit": "^2.2.11"
     }
 }
