@@ -69,7 +69,7 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-    if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
+    if (message.member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR) && message.channel.name === config.bot_channel) {
         var messageTrimmed = message.content.trim()
         var messageSplit = messageTrimmed.split('\n')
         var commands = new Map()
@@ -107,7 +107,7 @@ client.on('message', message => {
         }
 
         var mediaValdiator = (urls) => {
-            const imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp)+/gi
+            const imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp|mp4)+/gi
             return urls.filter((value, index, array) => {
                 return value.match(imageExpr)
             })
@@ -159,7 +159,8 @@ client.on('message', message => {
                 let commandMedia = commands.get('!media')
                 let commandContent = commands.get('!content')
                 if (commandContent && commandContent.length > 0) {
-                    let commandContentFormatted = commandContent[0].substr(0, 279)
+                    let commandContentSelected = commands.get('!content_twitter') ? commands.get('!content_twitter')[0] : commandContent[0]
+                    let commandContentFormatted = commandContentSelected.substr(0, 279)
                     if (commandMedia && commandMedia.length > 0) {
                         botTwitter.updateWithMedia(commandContentFormatted)
                             .then(() => { 
@@ -200,6 +201,8 @@ client.on('message', message => {
         var executeSocials = (async () => {
             await executeTwitter().then(() => { resultData.message.edit(resultData.compiled()) })
             await executeDevlog().then(() => { resultData.message.edit(resultData.compiled()) })
+            botUtils.logify(`Finished executing social mirroring`)
+            botUtils.logify(`***********************************`)
             botMedia.flushAll('./media/')
                 .catch(error => { botUtils.logify(`Failed to flush images ${error}`) })
         })
