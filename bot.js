@@ -106,106 +106,131 @@ client.on('message', message => {
             return element ? element[0] : ''
         }
 
-        var retrieveMedia = function() {
-            let imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp)+/gi
-            let medias = commands.get('!media')
-            let mediaResult = ''
-            if (medias) {
-                mediaResult += '_**MEDIA ATTACHMENTS**_\n'
-                medias.forEach(item => { mediaResult += item.match(imageExpr) ? `${item}\n` : '' })
-            }
-
-            return mediaResult
-        }
-
-        var retrieveSocials = function() {
-            var socialsResult = ''
-            socialsResult += `${hearts[0]}Twitter\n`
-            socialsResult += `${hearts[0]}Development Blog\n`
-            return socialsResult
-        }
-
-        var retrieveSocials2 = function() {
-            var socialsResult = ''
-            socialsResult += `${hearts[1]}Twitter\n`
-            socialsResult += `${hearts[0]}Development Blog\n`
-            return socialsResult
-        }
-
-        var retrieveSocials3 = function() {
-            var socialsResult = ''
-            socialsResult += `${hearts[1]}Twitter\n`
-            socialsResult += `${hearts[2]}Development Blog\n`
-            return socialsResult
-        }
-
-        var retrievePings = function() {
-            var pingsResult = ''
-            var pings = commands.get('!ping')
-            if (pings) {
-                pingsResult += '_**BROADCASTED MENTIONS**_\n'
-                pings.forEach(item => { pingsResult += `@${item} ` })
-            }
-            
-            return pingsResult
+        var mediaValdiator = (urls) => {
+            const imageExpr = /(http?s:\/\/)+(.*)\.(jpe?g|png|gif|bmp)+/gi
+            return urls.filter((value, index, array) => {
+                return value.match(imageExpr)
+            })
         }
 
         const now = new Date()
         const formattedDate = date.format(now, 'DD/MM/YYYY')
         const resultData = {
             message: null,
-            title: `:rotating_light: **${retrieveFirstContents('!title')} - ${formattedDate}**  :rotating_light:`,
+            title: `:rotating_light: **${retrieveFirstContents('!title').toUpperCase()} - ${formattedDate}** :rotating_light:`,
             content: `${retrieveFirstContents('!content')}`,
-            media: `${retrieveMedia()}`,
-            socials: `_**SOCIAL CHANNELS STATUS**_\n${retrieveSocials()}`,
-            pings: `${retrievePings()}`,
+            mediaState: {
+                twitter: 0,
+                devlog: 0
+            },
+            formatMedia: function() {
+                let medias = commands.get('!media')
+                let mediaResult = ''
+                if (medias) {
+                    mediaResult += '_**MEDIA ATTACHMENTS**_\n'
+                    mediaValdiator(medias).forEach(item => { mediaResult += `${item}\n` })
+                }
+
+                return mediaResult
+            },
+            formatSocials: function() {
+                var socialsResult = '_**SOCIAL CHANNELS STATUS**_\n'
+                socialsResult += `${hearts[this.mediaState.twitter]}Twitter\n`
+                socialsResult += `${hearts[this.mediaState.devlog]}Development Log\n`
+                return socialsResult
+            },
+            formatPings: function() {
+                var pingsResult = ''
+                var pings = commands.get('!ping')
+                if (pings) {
+                    pingsResult += '_**BROADCASTED MENTIONS**_\n'
+                    pings.forEach(item => { pingsResult += `@${item}\n` })
+                }
+                
+                return pingsResult
+            },
             compiled: function() {
-                return `${this.title}\n${this.content}${this.media}\n${this.socials}\n${this.pings}`
+                return `${this.title}\n${this.content}${this.formatMedia()}\n${this.formatSocials()}\n${this.formatPings()}`
             }
         }
 
         var executeTwitter = (async () => {
-            let commandMedia = commands.get('!media')
-            let commandContent = commands.get('!content')
-            if (commandContent) {
-                let commandContentFormatted = commandContent.substr(0, 279)
-                if (commandMedia && commandMedia.length > 0) {
-                    botTwitter.updateWithMedia(commandContentFormatted)
-                        .then(() => { botUtils.logify(`Twitter algorithm executed successfully`) })
-                        .catch((error) => { botUtils.logify(`Twitter algorithm executed unsuccessfully: ${JSON.stringify(error)}`) })
+            return new Promise((resolve, reject) => {
+                let commandMedia = commands.get('!media')
+                let commandContent = commands.get('!content')
+                if (commandContent && commandContent.length > 0) {
+                    let commandContentFormatted = commandContent[0].substr(0, 279)
+                    if (commandMedia && commandMedia.length > 0) {
+                        botTwitter.updateWithMedia(commandContentFormatted)
+                            .then(() => { 
+                                botUtils.logify(`Twitter algorithm executed successfully`) 
+                                resultData.mediaState['twitter'] = 1
+                                resolve()
+                            })
+                            .catch((error) => { 
+                                botUtils.logify(`Twitter algorithm executed unsuccessfully: ${JSON.stringify(error)}`) 
+                                resultData.mediaState['twitter'] = 3
+                                reject(error)
+                            })
+                    } else {
+                        botTwitter.update(commandContentFormatted)
+                            .then(() => { 
+                                botUtils.logify(`Twitter algorithm executed successfully`)
+                                resultData.mediaState['twitter'] = 1
+                                resolve()
+                            })
+                            .catch((error) => { 
+                                botUtils.logify(`Twitter algorithm executed unsuccessfully: ${JSON.stringify(error)}`) 
+                                resultData.mediaState['twitter'] = 3
+                                reject(error)
+                            })
+                    }
                 } else {
-                    botTwitter.update(commandContentFormatted)
-                        .then(() => { botUtils.logify(`Twitter algorithm executed successfully`) })
-                        .catch((error) => { botUtils.logify(`Twitter algorithm executed unsuccessfully: ${JSON.stringify(error)}`) })
+                    reject()
                 }
-            }
+            })
         })
 
-        var execute = (async () => {
-            if (commands.get('!content')) {
+        var executeDevlog = (async () => {
+            return new Promise((resolve, reject) => {
+                resolve()
+            })
+        })
+
+        var executeSocials = (async () => {
+            await executeTwitter().then(() => { resultData.message.edit(resultData.compiled()) })
+            await executeDevlog().then(() => { resultData.message.edit(resultData.compiled()) })
+            botMedia.flushAll('./media/')
+                .catch(error => { botUtils.logify(`Failed to flush images ${error}`) })
+        })
+
+        var messageExecute = (async () => {
+            if (commands.get('!content') && commands.get('!title')) {
                 message.channel.send(resultData.compiled())
                     .then(message => {
                         resultData.message = message
-                        executeTwitter()
-                        executeDevBlog()
-                        /*setTimeout(() => {
-                            if (resultData.message) {
-                                resultData.socials = `_**SOCIAL CHANNELS STATUS**_\n${retrieveSocials2()}`
-                                resultData.message.edit(resultData.compiled())
+                        if (commands.get('!media') && commands.get('!media').length > 0) {
+                            var urls = mediaValdiator(commands.get('!media'))
+                            if (urls.length > 0) {
+                                botMedia.downloadBatch(urls)
+                                    .then(() => {
+                                        executeSocials()
+                                    })
+                                    .catch((_) => {
+                                        resultData.mediaState['twitter'] = 3
+                                        resultData.mediaState['devlog'] = 3
+                                        resultData.message.edit(resultData.compiled())
+                                    })
+                            } else {
+                                executeSocials()
                             }
-                        }, 5000)
-
-                        setTimeout(() => {
-                            if (resultData.message) {
-                                resultData.socials = `_**SOCIAL CHANNELS STATUS**_\n${retrieveSocials3()}`
-                                resultData.message.edit(resultData.compiled())
-                            }
-                        }, 7500)*/
+                        }
                     })
                     .catch(error => { botUtils.logify(error) })
             }
-        })()
+        })
 
+        messageExecute()
         message.delete()
             .then(msg => botUtils.logify(`Relayed social update sent by ${msg.author.username} to all social channels`))
             .catch(botUtils.logify(console.error))

@@ -69,9 +69,26 @@ const retrieveAll = function(filesDir) {
     })
 }
 
+const flushAll = function(filesDir) {
+    return new Promise((resolve, reject) => {
+        fs.readdir(filesDir, (error, files) => {
+            if (error) {
+                reject(error)
+            } else {
+                files.forEach(item => {
+                    botUtils.logify(`Cleaning up file ${item}`)
+                    fs.unlinkSync(filesDir + item)
+                })
+                resolve()
+            }
+        })
+    })
+}
+
 module.exports = {
     download,
     downloadBatch,
     retrieve,
-    retrieveAll
+    retrieveAll,
+    flushAll
 }
