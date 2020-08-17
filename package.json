@@ -4,6 +4,9 @@
     "description": "A bot to push updates to defined social channels",
     "main": "bot.js",
     "author": "Stardust Collective",
+    "scripts" : {
+        "start": "node bot.js"
+    },
     "dependencies": {
         "date-and-time": "^0.14.0",
         "discord.js": "^12.3.0",
