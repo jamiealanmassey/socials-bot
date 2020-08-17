@@ -1,6 +1,7 @@
 // Grab libraries
 const Discord = require('discord.js')
 const date = require('date-and-time')
+const fs = require('fs')
 
 const botUtils = require('./bot-utils')
 const botMedia = require('./bot-media')
@@ -19,6 +20,7 @@ const hearts = [
 
 client.on('ready', () => {
     botUtils.logify('Successfully connected to server')
+    fs.mkdirSync('./media/')
     /*botMedia.downloadBatch([
         'https://images.gog-statics.com/99707f6415785f01a466ea80d8ade4ae215673f24cf708def9fdea373127e5f2_product_card_v2_mobile_slider_639.jpg',
         'https://images.gog-statics.com/e328d7a664292e21d6d78d097b7822c20751c162ea0baa8199d1ffd03aa639af_product_card_v2_mobile_slider_639.jpg'
