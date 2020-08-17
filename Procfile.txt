@@ -1,0 +1,2 @@
+web: echo "Ignore web"
+service: npm start
