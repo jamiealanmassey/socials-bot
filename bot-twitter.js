@@ -19,8 +19,8 @@ const uploadMedia = function(mediaData) {
             media_data: mediaData
         })
         .then((result) => {
-            console.log(botUtils.logify(`Twitter created media id from uploaded media`))
-            console.log(botUtils.logify(`Twitter media id is ${result.data.media_id_string}`))
+            botUtils.logify(`Twitter created media id from uploaded media`)
+            botUtils.logify(`Twitter media id is ${result.data.media_id_string}`)
             resolve(result.data.media_id_string)
         })
         .catch((error) => {
@@ -48,8 +48,8 @@ const update = function(status, media_ids) {
             if (error) {
                 reject(error)
             } else {
-                console.log(botUtils.logify(`Tweet was successfully sent!`))
-                console.log(botUtils.logify(`Tweet content was ${response.text}`))
+                botUtils.logify(`Tweet was successfully sent!`)
+                botUtils.logify(`Tweet content was ${response.text}`)
                 resolve(tweet, response)
             }
         })
@@ -62,7 +62,7 @@ const updateWithMedia = function(statusText) {
             .then((results) => {
                 uploadMediaBatch(results)
                     .then((resultMediaIDs) => {
-                        console.log(resultMediaIDs)
+                        botUtils.logify(resultMediaIDs)
                         update(statusText, resultMediaIDs)
                         .then((tweet, response) => {
                             resolve(tweet, response)

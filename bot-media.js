@@ -5,7 +5,7 @@ const fs = require('fs')
 const botUtils = require('./bot-utils')
 
 const download = async function(url) {
-    console.log(botUtils.logify(`Downloading image ${url}`))
+    botUtils.logify(`Downloading image ${url}`)
     const result = await fetch(url)
     const stream = fs.createWriteStream('./media/' + path.basename(url))
     await new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ const retrieve = function(file) {
             if (error) {
                 reject(error)
             } else {
-                console.log(botUtils.logify(`Successfully retrieved ${file} from file system.`))
+                botUtils.logify(`Successfully retrieved ${file} from file system.`)
                 resolve(data)
             }
         })
